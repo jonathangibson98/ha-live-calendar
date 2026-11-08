@@ -11,7 +11,7 @@
       },
       "ics": {
         "title": "ICS feed",
-        "description": "Paste the public or secret iCalendar (.ics / webcal://) address of the calendar.",
+        "description": "Paste the public or secret iCalendar address (.ics or webcal) of the calendar.",
         "data": {
           "name": "Calendar name",
           "url": "Calendar URL",
@@ -22,7 +22,7 @@
       },
       "caldav": {
         "title": "CalDAV server",
-        "description": "Enter the server address. You can use the server root (for example `https://caldav.icloud.com`) and the calendars will be discovered automatically.",
+        "description": "Enter the address of your CalDAV server. You can use the server root and your calendars will be discovered automatically.",
         "data": {
           "url": "Server or calendar URL",
           "username": "Username",
