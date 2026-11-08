@@ -1,94 +1,115 @@
-# Universal Media Player (UI)
+<p align="center">
+  <img src="images/banner.svg" alt="Live Calendar for Home Assistant" width="100%">
+</p>
 
-[![Open your Home Assistant instance and open Universal Media Player (UI) inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=jonathangibson98&repository=universal-media-player-ui&category=integration)
+<p align="center">
+  <a href="https://github.com/hacs/integration"><img alt="HACS Custom" src="https://img.shields.io/badge/HACS-Custom-41BDF5.svg"></a>
+  <a href="https://github.com/YOUR_GITHUB_USERNAME/ha-live-calendar/releases"><img alt="Release" src="https://img.shields.io/github/v/release/YOUR_GITHUB_USERNAME/ha-live-calendar"></a>
+  <a href="https://github.com/YOUR_GITHUB_USERNAME/ha-live-calendar/actions/workflows/validate.yml"><img alt="Validate" src="https://github.com/YOUR_GITHUB_USERNAME/ha-live-calendar/actions/workflows/validate.yml/badge.svg"></a>
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-green.svg"></a>
+</p>
 
-Home Assistant's [universal media player](https://www.home-assistant.io/integrations/universal)
-rebuilt as a custom integration you set up by **pointing and clicking**. No YAML and no
-templates to write: you pick children, entities and actions from lists and the integration
-does the rest.
+# Live Calendar
 
-It follows the same rules as the built-in universal player, and uses the same menus as
-[Template Media Player (UI)](https://github.com/jonathangibson98/template-media-player-ui).
+A read-only calendar integration for [Home Assistant](https://www.home-assistant.io/), inspired by the built-in [Remote Calendar](https://www.home-assistant.io/integrations/remote_calendar) integration, but built to **pick up changes within seconds instead of once a day**.
 
-> It lives in its own domain (`universal_media_player_ui`), so it never touches the built-in
-> `universal` platform. Any universal players you already have in `configuration.yaml` keep working.
+Add an event in your calendar app and it appears in Home Assistant almost immediately, and your automations fire on it.
 
-## Install
-[![Open your Home Assistant instance and open Universal Media Player (UI) inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=jonathangibson98&repository=universal-media-player-ui&category=integration)
+| | Remote Calendar (built in) | Live Calendar |
+|---|---|---|
+| Refresh | Every 24 h (or manual) | Every 30 s by default (min 10 s), plus instant push |
+| Sources | ICS URL | ICS URL **and CalDAV** (with auto-discovery) |
+| Cost when nothing changed | Full download | `304 Not Modified` / one tiny ctag request |
+| Instant push | No | Yes, via a secret webhook URL |
+| "Something changed" event | No | `live_calendar_changed` (added / removed / updated) |
+| Cancelled events | Hidden | Hidden |
 
-Or by hand:
+## How "real time" works (and what it can't do)
 
-1. Copy the `universal_media_player_ui` folder into `<your HA config>/custom_components/`
-   (the same folder that has `configuration.yaml`), or add this repository to HACS as a custom repository.
-2. Restart Home Assistant.
-3. Settings -> Devices & services -> Add integration -> "Universal Media Player (UI)".
+Calendar servers don't push to Home Assistant on their own, so Live Calendar combines three things:
 
-## Set it up
-Settings -> Devices & services -> Universal Media Player (UI) -> your player -> gear icon (Configure).
-Everything saves as you go. Choose **Save & close** when you're done.
+1. **Cheap, frequent change detection.** ICS feeds are polled with `If-None-Match` / `If-Modified-Since` and a content hash, so an unchanged calendar costs one `304`. CalDAV servers are asked for their `ctag` / `sync-token` and only changed events are downloaded. The file is only parsed when something actually changed.
+2. **A push webhook.** Every calendar gets a secret URL. Call it from the calendar side (a server hook, script, or automation) and Home Assistant refreshes **immediately**.
+3. **A manual trigger.** The normal `homeassistant.update_entity` action refreshes on demand.
 
-| YAML option | Where it is in the UI |
-|---|---|
-| `name` | When you add the player |
-| `children` | **Basics -> Children** (put them in order) |
-| `device_class` | **Basics** |
-| `browse_media_entity` | **Basics -> Media browser from** |
-| `state_template` / `attributes: state` | **State**: follow an entity's state, an attribute, or say which of its states mean on, off, playing... |
-| `active_child_template` | **Active child**: switch child depending on another entity's state, or write a template |
-| `attributes:` (`volume_level`, `is_volume_muted`, `source`, `source_list`, `sound_mode`, `sound_mode_list`...) | **What's playing** / **Player info**: pick an item, then choose where its value comes from (an entity's state, one of its attributes picked from a list, a fixed value, or "yes while an entity is in these states") |
-| any other attribute (for example `sound_mode_raw`) | **Extra attributes** |
-| `commands:` (`turn_on`, `volume_up`, `volume_set`, `select_source`...) | **Buttons** menus: pick a button, then choose what happens: pass it to another media player, pass it to the active child, control a device (switch, button, light, script, scene, remote...) from a list of actions, wait a moment, and chain as many steps as you like |
-| (new) one set of steps per source or sound mode | **Sources** / **Sound modes** |
-| the YAML itself | **Advanced**: template and YAML pages, if you ever want them. Anything set there shows up in the simple menus too |
+Be aware that **the calendar server decides how fresh its data is.** Some providers cache their ICS feed for hours (Google's "secret address" and Outlook.com's published links are known for this), so no integration can see changes sooner than the provider publishes them. CalDAV servers such as Nextcloud, iCloud, Fastmail and Radicale update immediately. See [docs/providers.md](docs/providers.md).
 
-A ✓ in a list means that item is already set up.
+Also note that the Home Assistant calendar *panel* loads events when you open or navigate it. The calendar **entity, its state and your automations** update instantly; an already-open panel updates the next time it fetches.
 
-## How it behaves (same as the built-in player)
-* The player follows the **first child that is not off, idle or unavailable**. Use **Active child** to override that.
-* Anything you leave empty is taken from the active child, and any button you don't set up is passed on to it.
-* **State**: if you set it and it says *off*, the player is off, whatever the children do. If it says *on* and no child is playing, the player is on. If you don't set it, the player simply shows the active child's state (or *off* when none is active).
-* Supported features (the buttons on the media card) are the active child's, plus every button you set up.
-* Media browsing and search use the player you pick in **Basics**, otherwise the active child, otherwise the first child.
+## Installation
 
-## Examples
-These are the examples from the Home Assistant documentation, done in the UI.
+### HACS (recommended)
 
-**Chromecast and Kodi, TV power on a switch, volume on a receiver**
-1. **Basics -> Children**: the Chromecast, then the Kodi player.
-2. **State**: *Use the state of an entity* -> `switch.living_room_tv`.
-3. **Buttons: power and volume**: Turn on -> *Control a device* -> `switch.living_room_tv` -> Turn on. Turn off likewise.
-   Set volume -> *Pass it on to another media player* -> `media_player.receiver`.
-4. **Player info**: Volume level -> *Use one attribute of an entity* -> `media_player.receiver` -> `volume_level`.
-   Current source and Source list likewise (`source`, `source_list`).
-5. **Buttons: repeat, shuffle...**: Pick a source -> *Pass it on to another media player* -> `media_player.receiver`.
+1. In Home Assistant open **HACS → ⋮ → Custom repositories**.
+2. Add `https://github.com/YOUR_GITHUB_USERNAME/ha-live-calendar` with category **Integration**.
+3. Search for **Live Calendar**, download it, and **restart Home Assistant**.
+4. Go to **Settings → Devices & services → Add integration → Live Calendar**.
 
-**Harmony remote**
-1. **State**: *Use the state of an entity* -> `remote.harmony_hub`.
-2. **Player info**: Source list -> attribute `activity_list`; Current source -> attribute `current_activity`.
-3. **Buttons**: Turn on / Turn off -> *Control a device* -> `remote.harmony_hub`. Volume up -> *Control a device* -> `remote.harmony_hub` -> *Send a remote command* (device `Receiver`, command `VolumeUp`).
-   Pick a source -> *Control a device* -> `remote.harmony_hub` -> Turn on, with the `activity` set to `{{ source }}` (use the YAML step for this one).
+### Manual
 
-**Denon AVR and HEOS**
-Children: the Denon AVR and the HEOS player. Basics -> Media browser from: the HEOS player.
-Turn on/off and volume up/down -> pass on to the Denon player. Sound mode, sound mode list -> attributes of the Denon player.
-Pick a sound mode -> pass on to the Denon player.
+Copy `custom_components/live_calendar` into your Home Assistant `config/custom_components/` folder and restart.
 
-**Override active child**
-The point-and-click option under **Active child** picks a child from another entity's *state*
-(for example "use the Sony PSK child while `sensor.tv_app` is `TV`, otherwise the Cast child").
-The documentation example checks an *attribute* (`app_name`), so for that one choose
-*Advanced: write a template myself* and paste the template from the documentation.
+Requires Home Assistant **2026.3.0** or newer. Full steps: [docs/installation.md](docs/installation.md).
 
-## Extras compared with the YAML version
-* `active_child` is shown as an attribute on the player, and is available to your steps as `{{ active_child }}`.
-* **Pass it on to the active child** is a step you can chain with others (for example: turn on a switch, wait, then press play on whichever child is active).
-* Sources and sound modes can each have their own steps, on top of the single "Pick a source" button.
-* Values you pass to a step are available under both the universal player's names (`volume_level`, `is_volume_muted`, `seek_position`, `media_content_id`...) and short names (`volume`, `mute`, `position`, `media_id`...).
+## Setup
 
-## Notes
-* Players you create here are separate from YAML universal players. There is no import; set them up again in the UI.
-* If the State setting gives something that is not a media player state (on, off, idle, playing, paused, standby, buffering), the player shows as off and a warning is logged.
+Choose how your calendar is available:
 
-## Help
-Questions or problems? Open an issue at
-<https://github.com/jonathangibson98/universal-media-player-ui/issues>.
+- **CalDAV server (fastest).** Enter the server address, username and an app password. Calendars are discovered automatically; pick one.
+  Examples: `https://caldav.icloud.com`, `https://caldav.fastmail.com/dav/`, `https://cloud.example.com/remote.php/dav` (Nextcloud).
+- **ICS / webcal URL.** Paste the `.ics` or `webcal://` address. Optional HTTP Basic credentials.
+
+Add the integration once per calendar. After setup, open the integration's **Configure** dialog to change the check interval and to copy the **push URL**.
+
+## Use it
+
+### Instant push
+
+Call the push URL (a `GET`, `POST` or `PUT`, no body needed) whenever your calendar changes:
+
+```bash
+curl -X POST "https://YOUR-HA/api/webhook/THE_SECRET_ID"
+```
+
+Calls closer than 2 s apart are rate-limited. Treat the URL like a password. See [docs/webhooks.md](docs/webhooks.md).
+
+### React to changes
+
+```yaml
+automation:
+  - alias: "Tell me when my calendar changes"
+    triggers:
+      - trigger: event
+        event_type: live_calendar_changed
+    actions:
+      - action: notify.notify
+        data:
+          message: >
+            {{ trigger.event.data.calendar }}:
+            {{ trigger.event.data.added | map(attribute='summary') | join(', ') }} added.
+```
+
+More examples (start-of-event triggers, lights, etc.) are in [docs/automations.md](docs/automations.md).
+
+### Entity
+
+Each calendar becomes a `calendar.*` entity: **on** during an event, **off** otherwise, with the usual `message`, `start_time`, `end_time`, `location`, `description` and `all_day` attributes for the current or next event, plus `last_change`. It works with the Calendar panel, the `calendar.get_events` action and calendar triggers.
+
+## Limitations
+
+- **Read-only.** Events can't be created or edited from Home Assistant.
+- **Basic authentication only.** OAuth providers (including Google CalDAV) are not supported yet.
+- One calendar per config entry.
+- Not yet verified against live servers. See the provider table in [docs/providers.md](docs/providers.md) and please report what works.
+
+## Documentation
+
+[Installation](docs/installation.md) · [Configuration](docs/configuration.md) · [Providers](docs/providers.md) · [Webhooks](docs/webhooks.md) · [Automations](docs/automations.md) · [Architecture](docs/architecture.md) · [Troubleshooting](docs/troubleshooting.md) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md)
+
+## Credits
+
+Parsing uses the excellent [`ical`](https://github.com/allenporter/ical) library, the same one Home Assistant's own calendar integrations use. This is an independent community project and is not affiliated with Home Assistant or Nabu Casa.
+
+## License
+
+[MIT](LICENSE)
