@@ -7,13 +7,13 @@ Requires Home Assistant **2026.3.0 or newer** (that is the first release where c
 1. Create an empty GitHub repository named `ha-live-calendar`.
 2. Replace the placeholder with your GitHub username everywhere:
    ```bash
-   ./scripts/set_github_user.sh your-username "Your Name"
+   ./scripts/set_github_user.sh jonathangibson98 "Your Name"
    ```
 3. Push:
    ```bash
    git init && git add . && git commit -m "Initial release"
    git branch -M main
-   git remote add origin https://github.com/your-username/ha-live-calendar.git
+   git remote add origin https://github.com/jonathangibson98/ha-live-calendar.git
    git push -u origin main
    git tag v0.1.0 && git push --tags
    ```
@@ -22,7 +22,7 @@ Requires Home Assistant **2026.3.0 or newer** (that is the first release where c
 ## Install with HACS
 
 1. HACS → ⋮ → **Custom repositories**.
-2. Repository: `https://github.com/your-username/ha-live-calendar`, Category: **Integration**.
+2. Repository: `https://github.com/jonathangibson98/ha-live-calendar`, Category: **Integration**.
 3. Find **Live Calendar** in HACS, **Download**, then **restart Home Assistant**.
 4. **Settings → Devices & services → Add integration → Live Calendar**.
 
