@@ -16,5 +16,5 @@ All notable changes are documented here. Format based on [Keep a Changelog](http
 - Configurable check interval (10 to 3600 s, default 30 s).
 - Re-authentication flow, diagnostics with secrets redacted, and bundled brand images.
 
-[Unreleased]: https://github.com/YOUR_GITHUB_USERNAME/ha-live-calendar/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/YOUR_GITHUB_USERNAME/ha-live-calendar/releases/tag/v0.1.0
+[Unreleased]: https://github.com/jonathangibson98/ha-live-calendar/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/jonathangibson98/ha-live-calendar/releases/tag/v0.1.0

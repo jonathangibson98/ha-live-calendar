@@ -4,8 +4,8 @@
 
 <p align="center">
   <a href="https://github.com/hacs/integration"><img alt="HACS Custom" src="https://img.shields.io/badge/HACS-Custom-41BDF5.svg"></a>
-  <a href="https://github.com/YOUR_GITHUB_USERNAME/ha-live-calendar/releases"><img alt="Release" src="https://img.shields.io/github/v/release/YOUR_GITHUB_USERNAME/ha-live-calendar"></a>
-  <a href="https://github.com/YOUR_GITHUB_USERNAME/ha-live-calendar/actions/workflows/validate.yml"><img alt="Validate" src="https://github.com/YOUR_GITHUB_USERNAME/ha-live-calendar/actions/workflows/validate.yml/badge.svg"></a>
+  <a href="https://github.com/jonathangibson98/ha-live-calendar/releases"><img alt="Release" src="https://img.shields.io/github/v/release/jonathangibson98/ha-live-calendar"></a>
+  <a href="https://github.com/jonathangibson98/ha-live-calendar/actions/workflows/validate.yml"><img alt="Validate" src="https://github.com/jonathangibson98/ha-live-calendar/actions/workflows/validate.yml/badge.svg"></a>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-green.svg"></a>
 </p>
 
@@ -41,7 +41,7 @@ Also note that the Home Assistant calendar *panel* loads events when you open or
 ### HACS (recommended)
 
 1. In Home Assistant open **HACS → ⋮ → Custom repositories**.
-2. Add `https://github.com/YOUR_GITHUB_USERNAME/ha-live-calendar` with category **Integration**.
+2. Add `https://github.com/jonathangibson98/ha-live-calendar` with category **Integration**.
 3. Search for **Live Calendar**, download it, and **restart Home Assistant**.
 4. Go to **Settings → Devices & services → Add integration → Live Calendar**.
 
