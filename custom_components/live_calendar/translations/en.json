@@ -1,1 +1,72 @@
-y
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Live Calendar",
+        "description": "How is your calendar available?",
+        "menu_options": {
+          "caldav": "CalDAV server (fastest, recommended)",
+          "ics": "ICS / webcal feed URL"
+        }
+      },
+      "ics": {
+        "title": "ICS feed",
+        "description": "Paste the public or secret iCalendar (.ics / webcal://) address of the calendar.",
+        "data": {
+          "name": "Calendar name",
+          "url": "Calendar URL",
+          "username": "Username (optional)",
+          "password": "Password (optional)",
+          "verify_ssl": "Verify SSL certificate"
+        }
+      },
+      "caldav": {
+        "title": "CalDAV server",
+        "description": "Enter the server address. You can use the server root (for example `https://caldav.icloud.com`) and the calendars will be discovered automatically.",
+        "data": {
+          "url": "Server or calendar URL",
+          "username": "Username",
+          "password": "Password / app password",
+          "verify_ssl": "Verify SSL certificate"
+        }
+      },
+      "pick": {
+        "title": "Choose a calendar",
+        "description": "Several calendars were found. Pick one (add the integration again for more).",
+        "data": {
+          "calendar": "Calendar"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate",
+        "description": "The server rejected the saved credentials. Enter new ones.",
+        "data": {
+          "username": "Username",
+          "password": "Password / app password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not reach the server or download the calendar.",
+      "invalid_auth": "The server rejected the username or password.",
+      "invalid_calendar": "The data returned could not be read as a calendar.",
+      "no_calendars": "No calendars were found at that address.",
+      "unknown": "Unexpected error. Check the Home Assistant log."
+    },
+    "abort": {
+      "already_configured": "This calendar is already configured.",
+      "reauth_successful": "Re-authentication was successful."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Live Calendar options",
+        "description": "**Push URL** (call it to refresh instantly, keep it secret):\n\n`{webhook_url}`\n\nThe interval controls how often the source is checked for changes. Checks are cheap when nothing changed.",
+        "data": {
+          "scan_interval": "Check for changes every (seconds)"
+        }
+      }
+    }
+  }
+}
