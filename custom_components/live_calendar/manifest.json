@@ -1,13 +1,13 @@
 {
   "domain": "live_calendar",
   "name": "Live Calendar",
-  "codeowners": ["@YOUR_GITHUB_USERNAME"],
+  "codeowners": ["@jonathangibson98"],
   "config_flow": true,
   "dependencies": ["webhook"],
-  "documentation": "https://github.com/YOUR_GITHUB_USERNAME/ha-live-calendar",
+  "documentation": "https://github.com/jonathangibson98/ha-live-calendar",
   "integration_type": "service",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/YOUR_GITHUB_USERNAME/ha-live-calendar/issues",
+  "issue_tracker": "https://github.com/jonathangibson98/ha-live-calendar/issues",
   "requirements": ["ical>=9.0.0"],
   "version": "0.1.0"
 }
